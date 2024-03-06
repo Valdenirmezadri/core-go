@@ -11,7 +11,9 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-type Configer[T struct{}] interface {
+type Config any
+
+type Configer[T Config] interface {
 	Get() T
 }
 
@@ -20,12 +22,12 @@ type Logger interface {
 	Error(args ...interface{})
 }
 
-type config[T struct{}] struct {
+type config[T Config] struct {
 	fileReader *viper.Viper
 	params     safe.Item[T]
 }
 
-func New[T struct{}](pathFileName string) (Configer[T], error) {
+func New[T Config](pathFileName string) (Configer[T], error) {
 
 	directory, name, extension, err := getFile(pathFileName)
 	if err != nil {
@@ -57,8 +59,9 @@ func New[T struct{}](pathFileName string) (Configer[T], error) {
 	}
 
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		err := repo.init()
-		log.Panic(err)
+		if err := repo.init(); err != nil {
+			log.Default().Printf("error on read file config %+v", err)
+		}
 	})
 
 	return repo, nil
