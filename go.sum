@@ -40,6 +40,10 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
+github.com/Valdenirmezadri/go-logging v1.0.1 h1:BYDTQcn8iHA4Y8pY02hN2u4Cs+s98GsyEaVYd/DOs9o=
+github.com/Valdenirmezadri/go-logging v1.0.1/go.mod h1:PoMs/RVPbxGMEwBN46oUiq6BJneiOtKne/2Rk3tD3kA=
+github.com/Valdenirmezadri/go-logging v1.1.0 h1:u/4zhTuZ9TLh300TGX07UhvNY135YZ52LQIO6SAnZYw=
+github.com/Valdenirmezadri/go-logging v1.1.0/go.mod h1:PoMs/RVPbxGMEwBN46oUiq6BJneiOtKne/2Rk3tD3kA=
 github.com/Valdenirmezadri/viper v1.7.3 h1:xtoqhqZUKuiYxS4VfgbzncAuTy1ivIseV+AnNtkc84o=
 github.com/Valdenirmezadri/viper v1.7.3/go.mod h1:h6QZhV0+XZSE0cxRcK8hWqcVw1+5FAC/H2B7MHhm7PI=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
@@ -641,6 +645,8 @@ gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/errgo.v2 v2.1.0/go.mod h1:hNsd1EY+bozCKY1Ytp96fpM3vjJbqLJn88ws8XvfDNI=
 gopkg.in/ini.v1 v1.62.0 h1:duBzk771uxoUuOlyRLkHsygud9+5lrlGjdFBb4mSKDU=
 gopkg.in/ini.v1 v1.62.0/go.mod h1:pNLf8WUiyNEtQjuu5G5vTm06TEv9tsIgeAvK8hOrP4k=
+gopkg.in/natefinch/lumberjack.v2 v2.2.1 h1:bBRl1b0OH9s/DuPhuXpNl+VtCaJXFZ5/uEFST95x9zc=
+gopkg.in/natefinch/lumberjack.v2 v2.2.1/go.mod h1:YD8tP3GAjkrDg1eZH7EGmyESg/lsYskCTPBJVb9jqSc=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.3/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
