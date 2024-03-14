@@ -1,22 +1,21 @@
 package safe
 
-import (
-	"sync"
-)
+import "sync"
 
-type Lister[K, V any] interface {
+type Lister[K comparable, V any] interface {
 	Len() int
 	Add(key K, value V)
-	Load(key K) (bool, V)
+	Has(key K) bool
+	Load(key K) (ok bool, value V)
 	Remove(key K)
 	Range(f func(key K, value V) bool)
 }
 
-type list[K any, V any] struct {
+type list[K comparable, V any] struct {
 	list sync.Map
 }
 
-func NewList[K, V any]() Lister[K, V] {
+func NewList[K comparable, V any]() Lister[K, V] {
 	return &list[K, V]{}
 }
 
@@ -50,6 +49,11 @@ func (e *list[K, V]) Range(f func(key K, value V) bool) {
 	e.list.Range(func(key, value interface{}) bool {
 		return f(key.(K), value.(V))
 	})
+}
+
+func (e *list[K, V]) Has(key K) bool {
+	ok, _ := e.Load(key)
+	return ok
 }
 
 // Load returns the value stored in the map for a key, or nil if no

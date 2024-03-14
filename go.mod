@@ -4,9 +4,11 @@ go 1.21.7
 
 require github.com/Valdenirmezadri/viper v1.7.3
 
+require github.com/smartystreets/goconvey v1.8.1 // indirect
+
 require (
-	github.com/Valdenirmezadri/go-logging v1.1.0
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/Valdenirmezadri/go-logging v1.1.1
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
@@ -16,7 +18,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	golang.org/x/sys v0.0.0-20210909193231-528a39cd75f3 // indirect
+	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

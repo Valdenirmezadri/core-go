@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Valdenirmezadri/core-go/observer"
 	"github.com/Valdenirmezadri/core-go/safe"
 	"github.com/Valdenirmezadri/viper"
 	"github.com/fsnotify/fsnotify"
@@ -15,6 +16,7 @@ type Config any
 
 type Configer[T Config] interface {
 	Get() T
+	Subscribe(fn func(T)) uint32
 }
 
 type Logger interface {
@@ -25,6 +27,7 @@ type Logger interface {
 type config[T Config] struct {
 	fileReader *viper.Viper
 	params     safe.Item[T]
+	pub        observer.Publisher[T]
 }
 
 func New[T Config](pathFileName string) (Configer[T], error) {
@@ -50,6 +53,7 @@ func New[T Config](pathFileName string) (Configer[T], error) {
 	repo := &config[T]{
 		fileReader: viper,
 		params:     safe.NewItem[T](),
+		pub:        observer.NewPublisher[T](true),
 	}
 
 	err = repo.init()
@@ -59,17 +63,16 @@ func New[T Config](pathFileName string) (Configer[T], error) {
 	}
 
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		if err := repo.init(); err != nil {
+		err := repo.init()
+		if err != nil {
 			log.Default().Printf("error on read file config %+v", err)
+			return
 		}
+
+		repo.pub.Next(repo.Get())
 	})
 
 	return repo, nil
-
-}
-
-func (r config[T]) Get() T {
-	return r.params.Get()
 }
 
 func (r config[T]) init() error {
@@ -82,6 +85,14 @@ func (r config[T]) init() error {
 
 	r.params.Set(c)
 	return nil
+}
+
+func (r *config[T]) Subscribe(fn func(T)) uint32 {
+	return r.pub.Subscribe(observer.NewListener[T](fn))
+}
+
+func (r config[T]) Get() T {
+	return r.params.Get()
 }
 
 func getExt(pathFileName string) (string, error) {

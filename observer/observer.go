@@ -1,14 +1,13 @@
 package observer
 
 import (
-	"fmt"
 	"sync/atomic"
 
 	"github.com/Valdenirmezadri/core-go/safe"
 )
 
 type Publisher[data any] interface {
-	Subscribe(Listenner[data]) (ID uint32, err error)
+	Subscribe(Listenner[data]) (ID uint32)
 	Next(data)
 	UnSubscribe(id uint32)
 	RemoveAll()
@@ -46,16 +45,14 @@ func (l *listen[D]) Listen(data D) {
 	l.f(data)
 }
 
-func (p *publisher[D]) Subscribe(o Listenner[D]) (ID uint32, err error) {
-	if o == nil {
-		return 0, fmt.Errorf("listenner is nil")
+func (p *publisher[D]) Subscribe(o Listenner[D]) (ID uint32) {
+	if o != nil {
+		nextID := atomic.AddUint32(&p.nextHandlerID, 1)
+		p.subscribers.Add(nextID, o)
+		return nextID
 	}
 
-	nextID := atomic.AddUint32(&p.nextHandlerID, 1)
-
-	p.subscribers.Add(nextID, o)
-
-	return nextID, nil
+	return 0
 }
 
 func (p *publisher[D]) Next(data D) {
