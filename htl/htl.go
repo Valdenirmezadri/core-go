@@ -12,7 +12,7 @@ var _to safe.Item[*log]
 
 type log struct {
 	options Options
-	logging *logging.Logger
+	logging logging.Logger
 	close   func() error
 }
 
@@ -47,7 +47,7 @@ func SetLevel(lv string) {
 	start(options)
 }
 
-func Log() *logging.Logger {
+func Log() logging.Logger {
 	return _to.Get().logging
 }
 
