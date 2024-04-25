@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Valdenirmezadri/core-go/htl"
 	"github.com/Valdenirmezadri/core-go/observer"
 	"github.com/Valdenirmezadri/core-go/safe"
 	"github.com/Valdenirmezadri/viper"
@@ -27,10 +28,33 @@ type Logger interface {
 type config[T Config] struct {
 	fileReader *viper.Viper
 	params     safe.Item[T]
+	defaultsFn setDefaults[T]
 	pub        observer.Publisher[T]
 }
 
+type setDefaults[T Config] func(c T) (T, error)
+
+func WithDefaults[T Config](pathFileName string, fn setDefaults[T]) (Configer[T], error) {
+	config, err := new[T](pathFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	config.defaultsFn = fn
+
+	return config, config.beforeReturn()
+}
+
 func New[T Config](pathFileName string) (Configer[T], error) {
+	config, err := new[T](pathFileName)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, config.beforeReturn()
+}
+
+func new[T Config](pathFileName string) (*config[T], error) {
 
 	directory, name, extension, err := getFile(pathFileName)
 	if err != nil {
@@ -56,26 +80,28 @@ func New[T Config](pathFileName string) (Configer[T], error) {
 		pub:        observer.NewPublisher[T](true),
 	}
 
-	err = repo.init()
-
-	if err != nil {
-		return nil, err
-	}
-
-	viper.OnConfigChange(func(in fsnotify.Event) {
-		err := repo.init()
-		if err != nil {
-			log.Default().Printf("error on read file config %+v", err)
-			return
-		}
-
-		repo.pub.Next(repo.Get())
-	})
-
 	return repo, nil
 }
 
-func (r config[T]) init() error {
+func (r *config[T]) beforeReturn() error {
+	if err := r.init(); err != nil {
+		return err
+	}
+
+	r.fileReader.OnConfigChange(func(in fsnotify.Event) {
+		err := r.init()
+		if err != nil {
+			log.Default().Printf("error on read file config %w", err)
+			return
+		}
+
+		r.pub.Next(r.Get())
+	})
+
+	return nil
+}
+
+func (r *config[T]) init() error {
 	var c T
 
 	err := r.fileReader.Unmarshal(&c)
@@ -83,7 +109,21 @@ func (r config[T]) init() error {
 		return err
 	}
 
+	if r.defaultsFn != nil {
+		c, err = r.defaultsFn(c)
+		if err != nil {
+			if htl.Log() != nil {
+				htl.Log().Error(err)
+				return err
+			}
+
+			log.Default().Println(err)
+			return err
+		}
+	}
+
 	r.params.Set(c)
+
 	return nil
 }
 
@@ -91,7 +131,7 @@ func (r *config[T]) Subscribe(fn func(T)) uint32 {
 	return r.pub.Subscribe(observer.NewListener[T](fn))
 }
 
-func (r config[T]) Get() T {
+func (r *config[T]) Get() T {
 	return r.params.Get()
 }
 
