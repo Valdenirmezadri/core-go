@@ -16,6 +16,7 @@ import (
 type Config any
 
 type Configer[T Config] interface {
+	GetCold() T
 	Get() T
 	Subscribe(fn func(T)) uint32
 }
@@ -27,6 +28,8 @@ type Logger interface {
 
 type config[T Config] struct {
 	fileReader *viper.Viper
+	first      safe.Item[bool]
+	coldParams safe.Item[T]
 	params     safe.Item[T]
 	defaultsFn setDefaults[T]
 	pub        observer.Publisher[T]
@@ -76,6 +79,8 @@ func new[T Config](pathFileName string) (*config[T], error) {
 
 	repo := &config[T]{
 		fileReader: viper,
+		first:      safe.NewItemWithData(false),
+		coldParams: safe.NewItem[T](),
 		params:     safe.NewItem[T](),
 		pub:        observer.NewPublisher[T](true),
 	}
@@ -122,6 +127,11 @@ func (r *config[T]) init() error {
 		}
 	}
 
+	if !r.first.Get() {
+		r.first.Set(true)
+		r.coldParams.Set(c)
+	}
+
 	r.params.Set(c)
 
 	return nil
@@ -129,6 +139,10 @@ func (r *config[T]) init() error {
 
 func (r *config[T]) Subscribe(fn func(T)) uint32 {
 	return r.pub.Subscribe(observer.NewListener[T](fn))
+}
+
+func (r *config[T]) GetCold() T {
+	return r.params.Get()
 }
 
 func (r *config[T]) Get() T {

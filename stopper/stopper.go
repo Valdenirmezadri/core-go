@@ -2,35 +2,43 @@ package stopper
 
 import (
 	"context"
+	"sync"
 )
 
-type Stopper interface {
+type Stoppers interface {
 	Stop()
-	Done() <-chan struct{}
-	//Context() context.Context
+	Context() context.Context
 }
 type stopper struct {
 	ctx    context.Context
 	cancel context.CancelFunc
+	mu     sync.Mutex
 }
 
-func New() Stopper {
+func New() Stoppers {
 	s := &stopper{}
+	s.mu = sync.Mutex{}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.ctx, s.cancel = context.WithCancel(context.Background())
+
 	return s
 }
 
-func (s stopper) Stop() {
+func (s *stopper) Stop() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.cancel != nil {
 		s.cancel()
 	}
 }
 
-func (s stopper) Done() <-chan struct{} {
-	return s.ctx.Done()
-}
+func (s *stopper) Context() context.Context {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-/* func (s stopper) Context() context.Context {
 	return s.ctx
 }
-*/
