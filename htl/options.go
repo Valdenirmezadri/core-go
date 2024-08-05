@@ -1,6 +1,6 @@
 package htl
 
-import "github.com/Valdenirmezadri/go-logging"
+import logging "github.com/Valdenirmezadri/ht-logging"
 
 type Optfunc func(*Options)
 

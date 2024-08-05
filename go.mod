@@ -13,7 +13,6 @@ require (
 )
 
 require (
-	github.com/Valdenirmezadri/go-logging v1.1.4
 	github.com/Valdenirmezadri/ht-logging v0.0.2
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -32,4 +31,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/Valdenirmezadri/go-logging => /home/junior/dev/go/go-logging
+replace github.com/Valdenirmezadri/ht-logging => /home/junior/dev/go/ht-logging
