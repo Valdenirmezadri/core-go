@@ -1,14 +1,17 @@
 package htl
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Valdenirmezadri/core-go/safe"
-	logging "github.com/Valdenirmezadri/go-logging"
+	logging "github.com/Valdenirmezadri/ht-logging"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var _to safe.Item[*log]
+const defaultInstance = "defaultInstance"
+
+var _to safe.Lister[string, *log]
 
 type log struct {
 	options Options
@@ -17,20 +20,47 @@ type log struct {
 }
 
 func init() {
-	_to = safe.NewItem[*log]()
+	_to = safe.NewList[string, *log]()
 }
 
 func Start(ops ...Optfunc) (close func() error, err error) {
+	return startDefault(ops...)
+}
+
+func startDefault(ops ...Optfunc) (close func() error, err error) {
 	o := defaultOps()
 	for _, fn := range ops {
 		fn(&o)
 	}
 
-	return Stop, start(o)
+	return Stop, _startDefault(o)
 }
 
 func Stop() error {
-	close := _to.Get().close
+	var errs []error
+	if err := stop(defaultInstance); err != nil {
+		errs = append(errs, err)
+	}
+
+	if len(errs) == 0 {
+		return nil
+	}
+
+	var allErr error
+	for _, err := range errs {
+		allErr = fmt.Errorf("%w\n%w", allErr, err)
+	}
+
+	return allErr
+}
+
+func stop(instance string) error {
+	ok, log := _to.Load(instance)
+	if !ok {
+		return fmt.Errorf("instance log %s not found", instance)
+	}
+
+	close := log.close
 	if close == nil {
 		return nil
 	}
@@ -39,107 +69,109 @@ func Stop() error {
 }
 
 func SetLevel(lv string) {
-	log := _to.Get()
+	_to.Range(func(instance string, _ *log) bool {
+		setLevel(instance, lv)
+		return true
+	})
+}
+
+func setLevel(instance, lv string) {
+	ok, log := _to.Load(instance)
+	if !ok {
+		return
+	}
+
 	options := log.options
 	options.level = options.level.New(lv)
 
-	Stop()
-	start(options)
+	log.options = options
+	log.logging.SetLevel(log.options.level.String())
 }
 
 func Log() logging.Logger {
-	return _to.Get().logging
+	_, log := _to.Load(defaultInstance)
+	return log.logging
 }
 
-func start(o Options) (err error) {
-	logger, err := logging.GetLogger(o.module)
+func _startDefault(o Options) (err error) {
+	log, err := _initDefault(o)
 	if err != nil {
 		return err
 	}
 
-	data := &log{logging: logger, options: o}
-
-	if err := data.init(); err != nil {
-		return err
-	}
-
-	_to.Set(data)
+	_to.Add(string(defaultInstance), log)
 
 	return nil
 }
 
-func (l *log) init() error {
-	if l.options.mode == "dev" {
-		close, err := l.devLog()
+func _initDefault(o Options) (*log, error) {
+	var backEnds []logging.Backend
+
+	file, close, err := prodLog(o)
+	if err != nil {
+		return nil, err
+	}
+
+	backEnds = append(backEnds, file)
+
+	if o.mode == "dev" {
+		console, err := devLog()
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		l.close = close
-		return nil
+		backEnds = append(backEnds, console)
 	}
 
-	close, err := l.prodLog()
+	logging, err := logging.New(o.level.String(), backEnds...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	l.close = close
-	return nil
+	return &log{logging: logging, close: close, options: o}, nil
 }
 
-func (l *log) devLog() (close func() error, err error) {
+func devLog() (consoleBackend logging.Backend, err error) {
 	console := logging.NewLogBackend(os.Stderr, "", 0)
 	consoleFormatter := logging.NewBackendFormatter(console, formatConsole)
-	consoleBackend := logging.AddModuleLevel(consoleFormatter)
-	consoleBackend.SetLevel(l.options.level, l.options.module)
 
-	fileBackend, close, err := l.fileBackend()
-	if err != nil {
-		return nil, err
-	}
-
-	logging.SetBackend(consoleBackend, fileBackend)
-	return close, nil
+	return consoleFormatter, nil
 }
 
-func (l *log) prodLog() (close func() error, err error) {
-	fileBackend, close, err := l.fileBackend()
+func prodLog(o Options) (backend logging.Backend, close func() error, err error) {
+	fileBackend, close, err := fileBackend(o)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	logging.SetBackend(fileBackend)
-	return close, nil
+	return fileBackend, close, nil
 }
 
-func (l *log) fileBackend() (fileFormatter logging.Backend, close func() error, err error) {
-	writer, close, err := l.writerToWithRotation()
+func fileBackend(o Options) (fileFormatter logging.Backend, close func() error, err error) {
+	writer, close, err := writerToWithRotation(o)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	fileFromatter := logging.NewBackendFormatter(writer, formatFile)
-	fileBackend := logging.AddModuleLevel(fileFromatter)
-	fileBackend.SetLevel(l.options.level, l.options.module)
 
-	return fileBackend, close, nil
+	return fileFromatter, close, nil
 }
 
-func (l *log) writerToWithRotation() (writer *logging.LogBackend, close func() error, err error) {
+func writerToWithRotation(o Options) (writer *logging.LogBackend, close func() error, err error) {
 	rotate := &lumberjack.Logger{
-		Filename:   l.options.pathLog,
-		MaxSize:    int(l.options.maxAge),
-		MaxBackups: int(l.options.maxBackups),
-		MaxAge:     int(l.options.maxAge),
-		Compress:   l.options.compress,
+		Filename:   o.pathLog,
+		MaxSize:    int(o.maxAge),
+		MaxBackups: int(o.maxBackups),
+		MaxAge:     int(o.maxAge),
+		Compress:   o.compress,
 	}
 
 	return logging.NewLogBackend(rotate, "", 0), rotate.Close, nil
 }
 
 var formatConsole = logging.MustStringFormatter(
-	`%{color} %{time:15:04:05.000} %{shortfile} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+	`%{color}%{time:15:04:05.000} %{shortfile} ▶ %{level:.4s} %{color:reset}%{message}`,
 )
 
 var formatFile = logging.MustStringFormatter(

@@ -22,6 +22,7 @@ func newItem[T any]() Item[T] {
 
 type Item[T any] interface {
 	Set(c T)
+	Update(fn func(T) error) error
 	Get() T
 }
 
@@ -34,6 +35,17 @@ func (p *item[T]) Set(c T) {
 	p.lock.Lock()
 	p.data = c
 	p.lock.Unlock()
+}
+
+func (p *item[T]) Update(fn func(T) error) error {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	if err := fn(p.data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *item[T]) Get() T {
