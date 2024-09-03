@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+	"time"
 )
 
 type Validator interface {
@@ -9,6 +10,8 @@ type Validator interface {
 	Uint8(n uint8, field string) error
 	String(s string, field string) error
 	Nil(value interface{}, field string) error
+	Time(value time.Time, field string) error
+	TimeBetween(start, end time.Time) error
 }
 
 type validator struct {
