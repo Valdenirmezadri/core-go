@@ -7,6 +7,8 @@ type Lister[K comparable, V any] interface {
 	Add(key K, value V)
 	Has(key K) bool
 	Load(key K) (ok bool, value V)
+	LoadOrStore(key K, value V) (actual V, loaded bool)
+	CompareAndSwap(key K, old, new V) bool
 	Remove(key K)
 	Range(f func(key K, value V) bool)
 }

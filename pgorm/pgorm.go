@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Valdenirmezadri/core-go/environment"
 	htl "github.com/Valdenirmezadri/core-go/htl"
-	"github.com/Valdenirmezadri/htrelay-server/modules/core"
 	"github.com/hashicorp/go-version"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,7 +20,7 @@ type DB interface {
 	NewVersion(ver string) (version *version.Version, err error)
 	UpdateVersion(newVer *version.Version) error
 	initDB() error
-	LogLevel(env core.Environment, l string)
+	LogLevel(env environment.Environment, l string)
 }
 
 type conn struct {
@@ -53,7 +53,7 @@ type DBConfig struct {
 	Log          string
 }
 
-func (c *conn) LogLevel(env core.Environment, l string) {
+func (c *conn) LogLevel(env environment.Environment, l string) {
 	level := level(l)
 
 	c.lock.Lock()
@@ -78,7 +78,7 @@ func level(s string) logger.LogLevel {
 	}
 }
 
-func New(host, sslMode, timeZone string, openConns, maxIdleConns uint, dbname, user, pass string, logLevel string, env core.Environment) (DB, error) {
+func New(host, sslMode, timeZone string, openConns, maxIdleConns uint, dbname, user, pass string, logLevel string, env environment.Environment) (DB, error) {
 	return connectGORM(host, user, pass, dbname, sslMode, timeZone, openConns, maxIdleConns, level(logLevel), env)
 }
 
@@ -88,7 +88,7 @@ func buildDBURI(HOST, USER, PASS, DBNAME, sslMode, timeZone string) string {
 }
 
 // ConnectGORM Abre a conexão com o banco de dados
-func connectGORM(HOST, USER, PASS, DBNAME, sslMode, timeZone string, openConns, maxIdleConns uint, logLevel logger.LogLevel, env core.Environment) (DB, error) {
+func connectGORM(HOST, USER, PASS, DBNAME, sslMode, timeZone string, openConns, maxIdleConns uint, logLevel logger.LogLevel, env environment.Environment) (DB, error) {
 	htl.Log().Debugf("conectando ao banco %+v\n", DBNAME)
 
 	db, err := gorm.Open(postgres.Open(buildDBURI(HOST, USER, PASS, DBNAME, sslMode, timeZone)), &gorm.Config{
@@ -119,8 +119,8 @@ func connectGORM(HOST, USER, PASS, DBNAME, sslMode, timeZone string, openConns, 
 	return conn, nil
 }
 
-func newLogger(env core.Environment, loglevel logger.LogLevel) logger.Interface {
-	color := env == core.Developer
+func newLogger(env environment.Environment, loglevel logger.LogLevel) logger.Interface {
+	color := env == environment.Developer
 	ignoreNotfound := true
 	if loglevel == logger.Info {
 		ignoreNotfound = false
