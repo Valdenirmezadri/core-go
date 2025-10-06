@@ -14,7 +14,7 @@ const defaultInstance = "defaultInstance"
 var _to safe.Lister[string, *log]
 
 type log struct {
-	options Options
+	options safe.Item[Options]
 	logging logging.Logger
 	close   func() error
 }
@@ -81,11 +81,11 @@ func setLevel(instance, lv string) {
 		return
 	}
 
-	options := log.options
-	options.level = options.level.New(lv)
-
-	log.options = options
-	log.logging.SetLevel(log.options.level.String())
+	log.options.Update(func(options Options) Options {
+		options.level = options.level.New(lv)
+		log.logging.SetLevel(options.level.String())
+		return options
+	})
 }
 
 func Log() logging.Logger {
@@ -128,7 +128,7 @@ func _initDefault(o Options) (*log, error) {
 		return nil, err
 	}
 
-	return &log{logging: logging, close: close, options: o}, nil
+	return &log{logging: logging, close: close, options: safe.NewItemWithData(o)}, nil
 }
 
 func devLog() (consoleBackend logging.Backend, err error) {

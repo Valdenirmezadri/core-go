@@ -1,6 +1,9 @@
 package htl
 
-import logging "github.com/Valdenirmezadri/ht-logging"
+import (
+	"github.com/Valdenirmezadri/core-go/safe"
+	logging "github.com/Valdenirmezadri/ht-logging"
+)
 
 func StartInstance(instance string, ops ...Optfunc) (err error) {
 	o := defaultOps()
@@ -29,7 +32,7 @@ func _initInstance(o Options) (*log, error) {
 		return nil, err
 	}
 
-	return &log{logging: logging, close: close, options: o}, nil
+	return &log{logging: logging, close: close, options: safe.NewItemWithData(o)}, nil
 }
 
 func StopInstance(instance string) error {
