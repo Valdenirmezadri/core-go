@@ -39,6 +39,7 @@ require (
 require (
 	github.com/Valdenirmezadri/ht-logging v0.0.3
 	github.com/fsnotify/fsnotify v1.7.0
+	github.com/google/btree v1.1.3
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/magiconair/properties v1.8.5 // indirect
