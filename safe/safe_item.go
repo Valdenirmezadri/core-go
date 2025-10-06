@@ -25,17 +25,20 @@ type Item[T any] interface {
 	Update(fn func(T) T)
 	UpdateErr(fn func(T) (T, error)) error
 	Get() T
+	GetOrStore(T) T
 	Read(fn func(T) error) error
 }
 
 type item[T any] struct {
-	data T
-	lock sync.RWMutex
+	data        T
+	initialized bool
+	lock        sync.RWMutex
 }
 
 func (p *item[T]) Set(c T) {
 	p.lock.Lock()
 	p.data = c
+	p.initialized = true
 	p.lock.Unlock()
 }
 
@@ -58,6 +61,19 @@ func (p *item[T]) Update(fn func(T) T) {
 	defer p.lock.Unlock()
 
 	p.data = fn(p.data)
+}
+
+func (p *item[T]) GetOrStore(store T) T {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	if p.initialized {
+		return p.data
+	}
+
+	p.data = store
+	p.initialized = true
+	return store
 }
 
 func (p *item[T]) Get() T {
