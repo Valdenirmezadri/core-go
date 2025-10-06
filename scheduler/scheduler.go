@@ -21,6 +21,7 @@ const (
 	EveryMinute SpecType = "1 * * * *"
 	EveryHour   SpecType = "0 * * * *"
 	TwoAM       SpecType = "0 2 * * *"
+	FiveAM      SpecType = "0 5 * * *"
 )
 
 type Scheduler interface {
