@@ -35,7 +35,9 @@ type HelperEcho interface {
 	QueryToTime(c echo.Context, param string) (time.Time, error)
 
 	Response(c echo.Context, data any) error
+	ResponseMessage(c echo.Context, message string) error
 	ResponseAction(c echo.Context, message string, data any) error
+	ResponseCodeErr(c echo.Context, code int, errs ...error) error
 	ResponseErr(c echo.Context, err error) error
 	BadRequestErr(c echo.Context, err error) error
 }
@@ -47,11 +49,14 @@ func New() HelperEcho {
 	return &helperEcho{}
 }
 
+func (h helperEcho) ResponseMessage(c echo.Context, message string) error {
+	return h.ResponseAction(c, message, nil)
+}
+
 func (helperEcho) Response(c echo.Context, data any) error {
 	return c.JSON(http.StatusOK, Result{
 		Data: data,
 	})
-
 }
 
 func (helperEcho) ResponseAction(c echo.Context, message string, data any) error {
@@ -63,14 +68,14 @@ func (helperEcho) ResponseAction(c echo.Context, message string, data any) error
 }
 
 func (r *helperEcho) BadRequestErr(c echo.Context, err error) error {
-	return r.responseErr(c, http.StatusBadRequest, err)
+	return r.ResponseCodeErr(c, http.StatusBadRequest, err)
 }
 
 func (r *helperEcho) ResponseErr(c echo.Context, err error) error {
-	return r.responseErr(c, http.StatusInternalServerError, err)
+	return r.ResponseCodeErr(c, http.StatusInternalServerError, err)
 }
 
-func (helperEcho) responseErr(c echo.Context, code int, errs ...error) error {
+func (helperEcho) ResponseCodeErr(c echo.Context, code int, errs ...error) error {
 	var errsStr []string
 	for _, err := range errs {
 		errsStr = append(errsStr, err.Error())
