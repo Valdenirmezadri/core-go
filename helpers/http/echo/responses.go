@@ -68,6 +68,15 @@ func (helperEcho) Response(c echo.Context, data any) error {
 	})
 }
 
+func (r *helperEcho) RelayResponse(c echo.Context, b []byte) error {
+	old, err := Result{}.Unmarshall(b)
+	if err != nil {
+		return err
+	}
+
+	return r.ResponseAction(c, old.Message, old.Data)
+}
+
 func (helperEcho) ResponseAction(c echo.Context, message string, data any) error {
 	return c.JSON(http.StatusOK, Result{
 		Message: message,
