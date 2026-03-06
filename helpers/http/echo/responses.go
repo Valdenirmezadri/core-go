@@ -1,9 +1,11 @@
 package helperecho
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
+	"github.com/Valdenirmezadri/core-go/slices"
 	"github.com/labstack/echo/v4"
 )
 
@@ -82,11 +84,22 @@ func (r *helperEcho) ResponseErr(c echo.Context, err error) error {
 	return r.ResponseCodeErr(c, http.StatusInternalServerError, err)
 }
 
+func (r *helperEcho) RelayErr(c echo.Context, code int, b []byte) error {
+	old, err := Err{}.Unmarshall(b)
+	if err != nil {
+		return err
+	}
+
+	errs := slices.Map(old.Errors, func(err string) error { return errors.New(err) })
+	return r.ResponseCodeErr(c, code, errs...)
+}
+
 func (helperEcho) ResponseCodeErr(c echo.Context, code int, errs ...error) error {
 	var errsStr []string
 	for _, err := range errs {
 		errsStr = append(errsStr, err.Error())
 	}
+
 	return c.JSON(code, Err{
 		Errors: errsStr,
 	})
