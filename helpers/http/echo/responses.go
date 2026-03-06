@@ -10,6 +10,13 @@ import (
 type HelperEcho interface {
 	Bind(c echo.Context, i interface{}) error
 
+	RequiredPropToString(c echo.Context, propName string) (string, error)
+	PropToString(c echo.Context, propName string, required bool) (string, error)
+	RequiredPropToUint(c echo.Context, propName string) (uint, error)
+	PropToUint(c echo.Context, propName string, required bool) (uint, error)
+	RequiredPropToBool(c echo.Context, propName string) (bool, error)
+	PropToBool(c echo.Context, propName string, required bool) (bool, error)
+
 	RequiredFormToString(c echo.Context, param string) (string, error)
 	RequiredFormToUint(c echo.Context, param string) (uint, error)
 	FormToString(c echo.Context, param string) (string, error)
