@@ -49,6 +49,10 @@ type HelperEcho interface {
 	ResponseCodeErr(c echo.Context, code int, errs ...error) error
 	ResponseErr(c echo.Context, err error) error
 	BadRequestErr(c echo.Context, err error) error
+
+	Relay(c echo.Context, code int, b []byte) error
+	RelayErr(c echo.Context, code int, b []byte) error
+	RelayResponse(c echo.Context, code int, b []byte) error
 }
 
 type helperEcho struct {
@@ -68,21 +72,32 @@ func (helperEcho) Response(c echo.Context, data any) error {
 	})
 }
 
-func (r *helperEcho) RelayResponse(c echo.Context, b []byte) error {
+func (r *helperEcho) Relay(c echo.Context, code int, b []byte) error {
+	if code != 200 {
+		return r.RelayErr(c, code, b)
+	}
+
+	return r.RelayResponse(c, code, b)
+}
+
+func (r *helperEcho) RelayResponse(c echo.Context, code int, b []byte) error {
 	old, err := Result{}.Unmarshall(b)
 	if err != nil {
 		return err
 	}
 
-	return r.ResponseAction(c, old.Message, old.Data)
+	return c.JSON(code, Result{
+		Message: old.Message,
+		Data:    old.Data,
+	})
 }
 
-func (helperEcho) ResponseAction(c echo.Context, message string, data any) error {
-	return c.JSON(http.StatusOK, Result{
-		Message: message,
-		Data:    data,
-	})
+func (h *helperEcho) ResponseAction(c echo.Context, message string, data any) error {
+	return h.response(c, http.StatusOK, message, data)
+}
 
+func (helperEcho) response(c echo.Context, code int, message string, data any) error {
+	return c.JSON(code, Result{Message: message, Data: data})
 }
 
 func (r *helperEcho) BadRequestErr(c echo.Context, err error) error {
