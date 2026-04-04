@@ -54,6 +54,22 @@ func (h *helperEcho) formToUint(c echo.Context, param string, required bool) (ui
 	return h.convStrToUint(strID, required)
 }
 
+func (h *helperEcho) FormBool(c echo.Context, param string) (bool, error) {
+	str := strings.ToLower(strings.TrimSpace(c.FormValue(param)))
+	if str == "" {
+		return false, nil
+	}
+
+	switch str {
+	case "true", "1":
+		return true, nil
+	case "false", "0":
+		return false, nil
+	default:
+		return false, fmt.Errorf("form boolean parameter '%s' is required", param)
+	}
+}
+
 func (h *helperEcho) ParamToString(c echo.Context, param string) (string, error) {
 	return h.paramToString(c, param, false)
 }
