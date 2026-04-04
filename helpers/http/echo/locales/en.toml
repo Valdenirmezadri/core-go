@@ -1,0 +1,41 @@
+[QueryRequired]
+other = "query parameter '{{.Field}}' is required"
+
+[FormRequired]
+other = "form field '{{.Field}}' is required"
+
+[PathRequired]
+other = "path parameter '{{.Field}}' is required"
+
+[PropRequired]
+other = "property '{{.Field}}' is required"
+
+[PropNotFound]
+other = "property '{{.Field}}' not found"
+
+[PropType]
+other = "property '{{.Field}}' need to be '{{.Type}}'"
+
+[InvalidBoolForm]
+other = "form field '{{.Field}}' has an invalid value, need to be 'true', '1', 'false', '0' or ''"
+
+[InvalidBoolQuery]
+other = "query parameter '{{.Field}}' has an invalid value, need to be 'true', '1', 'false', '0' or ''"
+
+[QueryDateRequired]
+other = "query parameter '{{.Field}}' is required as 'YYYY-MM-DD'"
+
+[QueryDateInvalid]
+other = "query parameter '{{.Field}}' is not a valid date format 'YYYY-MM-DD'"
+
+[QueryDateTimeRequired]
+other = "query parameter '{{.Field}}' is required as 'YYYY-MM-DDTHH:MM:SS'"
+
+[QueryDateTimeInvalid]
+other = "query parameter '{{.Field}}' is not a valid datetime format 'YYYY-MM-DDTHH:MM:SS'"
+
+[QueryTimeRequired]
+other = "query parameter '{{.Field}}' is required as 'HH:MM:SS'"
+
+[QueryTimeInvalid]
+other = "query parameter '{{.Field}}' is not a valid time format 'HH:MM:SS'"

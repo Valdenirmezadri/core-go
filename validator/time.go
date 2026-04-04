@@ -1,29 +1,30 @@
 package validator
 
 import (
-	"fmt"
+	"errors"
 	"time"
+
+	"github.com/Valdenirmezadri/core-go/context/corectx"
 )
 
-func (validator) Time(time time.Time, field string) error {
-	if time.IsZero() {
-		return fmt.Errorf("%s time is not valid", field)
+func (v *validator) Time(ctx corectx.Context, t time.Time, field string) error {
+	if t.IsZero() {
+		return errors.New(v.t.S(ctx, "TimeNotValid", map[string]string{"Field": field}))
 	}
-
 	return nil
 }
 
-func (v *validator) TimeBetween(start, end time.Time) error {
-	if err := v.Time(start, "start"); err != nil {
+func (v *validator) TimeBetween(ctx corectx.Context, start, end time.Time) error {
+	if err := v.Time(ctx, start, "start"); err != nil {
 		return err
 	}
 
-	if err := v.Time(end, "end"); err != nil {
+	if err := v.Time(ctx, end, "end"); err != nil {
 		return err
 	}
 
 	if end.Before(start) {
-		return fmt.Errorf("end time must be after start time")
+		return errors.New(v.t.S(ctx, "EndTimeAfterStart", nil))
 	}
 
 	return nil

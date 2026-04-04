@@ -1,0 +1,41 @@
+[QueryRequired]
+other = "parâmetro de consulta '{{.Field}}' é obrigatório"
+
+[FormRequired]
+other = "campo de formulário '{{.Field}}' é obrigatório"
+
+[PathRequired]
+other = "parâmetro de rota '{{.Field}}' é obrigatório"
+
+[PropRequired]
+other = "propriedade '{{.Field}}' é obrigatória"
+
+[PropNotFound]
+other = "propriedade '{{.Field}}' não encontrada"
+
+[PropType]
+other = "propriedade '{{.Field}}' precisa ser '{{.Type}}'"
+
+[InvalidBoolForm]
+other = "campo de formulário '{{.Field}}' tem valor inválido, precisa ser 'true', '1', 'false', '0' ou ''"
+
+[InvalidBoolQuery]
+other = "parâmetro de consulta '{{.Field}}' tem valor inválido, precisa ser 'true', '1', 'false', '0' ou ''"
+
+[QueryDateRequired]
+other = "parâmetro de consulta '{{.Field}}' é obrigatório no formato 'YYYY-MM-DD'"
+
+[QueryDateInvalid]
+other = "parâmetro de consulta '{{.Field}}' não é uma data válida no formato 'YYYY-MM-DD'"
+
+[QueryDateTimeRequired]
+other = "parâmetro de consulta '{{.Field}}' é obrigatório no formato 'YYYY-MM-DDTHH:MM:SS'"
+
+[QueryDateTimeInvalid]
+other = "parâmetro de consulta '{{.Field}}' não é uma data/hora válida no formato 'YYYY-MM-DDTHH:MM:SS'"
+
+[QueryTimeRequired]
+other = "parâmetro de consulta '{{.Field}}' é obrigatório no formato 'HH:MM:SS'"
+
+[QueryTimeInvalid]
+other = "parâmetro de consulta '{{.Field}}' não é um horário válido no formato 'HH:MM:SS'"

@@ -9,6 +9,8 @@ type Item[T any] interface {
 	Unset()
 	Get() (T, error)
 	IsSet() bool
+	Update(fn func(T) T)
+	UpdateErr(fn func(T) (T, error)) error
 }
 
 type item[T any] struct {
@@ -47,4 +49,12 @@ func (p *item[T]) Get() (T, error) {
 
 	var zero T
 	return zero, p.err
+}
+
+func (p *item[T]) Update(fn func(T) T) {
+	p.data.Update(fn)
+}
+
+func (p *item[T]) UpdateErr(fn func(T) (T, error)) error {
+	return p.data.UpdateErr(fn)
 }

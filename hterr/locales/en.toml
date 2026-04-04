@@ -1,0 +1,50 @@
+[JWTInvalid]
+other = "JWT invalid"
+
+[JWTKeyNotFound]
+other = "JWT key not found"
+
+[JWTClaimsNotFound]
+other = "JWT claims not found"
+
+[JWTInvalidIP]
+other = "invalid IP"
+
+[TokenInvalid]
+other = "invalid token"
+
+[TokenBlock]
+other = "token block"
+
+[EmptyIP]
+other = "empty IP"
+
+[BannedIP]
+other = "IP blocked, reached maximum number of login attempts"
+
+[TokenNotAuthorized]
+other = "token not authorized"
+
+[DBConnectionNil]
+other = "database connection is nil"
+
+[TransactionAlreadyRunning]
+other = "cannot start transaction when another is running"
+
+[TransactionEmpty]
+other = "transaction is empty"
+
+[UserIDRequired]
+other = "user id required"
+
+[UserKindRequired]
+other = "user kind required"
+
+[NotSubscribed]
+other = "not found '{{.ID}}', recipient not subscribed"
+
+[EmailInvalid]
+other = "invalid email"
+
+[PasswordMismatch]
+other = "password and password confirmation do not match"

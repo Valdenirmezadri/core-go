@@ -1,0 +1,50 @@
+[JWTInvalid]
+other = "JWT inválido"
+
+[JWTKeyNotFound]
+other = "chave JWT não encontrada"
+
+[JWTClaimsNotFound]
+other = "claims JWT não encontrados"
+
+[JWTInvalidIP]
+other = "IP inválido"
+
+[TokenInvalid]
+other = "token inválido"
+
+[TokenBlock]
+other = "token bloqueado"
+
+[EmptyIP]
+other = "IP vazio"
+
+[BannedIP]
+other = "IP bloqueado, atingiu o número máximo de tentativas de login"
+
+[TokenNotAuthorized]
+other = "token não autorizado"
+
+[DBConnectionNil]
+other = "conexão com o banco de dados é nula"
+
+[TransactionAlreadyRunning]
+other = "não é possível iniciar transação enquanto outra está em execução"
+
+[TransactionEmpty]
+other = "transação está vazia"
+
+[UserIDRequired]
+other = "id do usuário obrigatório"
+
+[UserKindRequired]
+other = "tipo do usuário obrigatório"
+
+[NotSubscribed]
+other = "não encontrado '{{.ID}}', destinatário não inscrito"
+
+[EmailInvalid]
+other = "email inválido"
+
+[PasswordMismatch]
+other = "senha e confirmação de senha não coincidem"

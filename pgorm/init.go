@@ -1,6 +1,7 @@
 package pgorm
 
 import (
+	"errors"
 	"fmt"
 
 	htl "github.com/Valdenirmezadri/core-go/htl"
@@ -50,8 +51,8 @@ func (c conn) initDB() error {
 		return nil
 	}
 
-	pgErr := err.(*pgconn.PgError)
-	if pgErr.Code == "42P01" {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "42P01" {
 		htl.Log().Info("iniciando banco de dados...")
 		if err := c.unaccent(); err != nil {
 			return err

@@ -1,0 +1,20 @@
+[NilFieldRequired]
+other = "null field '{{.Field}}' is required"
+
+[FieldTypeRequired]
+other = "field '{{.Field}}' of type '{{.Type}}' is required"
+
+[InvalidURL]
+other = "invalid url '{{.Field}}'"
+
+[TimeNotValid]
+other = "{{.Field}} time is not valid"
+
+[EndTimeAfterStart]
+other = "end time must be after start time"
+
+[InvalidEmail]
+other = "invalid email '{{.Field}}'"
+
+[PasswordMismatch]
+other = "password and password confirmation do not match"
