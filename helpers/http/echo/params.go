@@ -54,6 +54,10 @@ func (h *helperEcho) formToUint(c echo.Context, param string, required bool) (ui
 	return h.convStrToUint(strID, required)
 }
 
+func (h *helperEcho) FormToBool(c echo.Context, param string) (bool, error) {
+	return h.FormBool(c, param)
+}
+
 func (h *helperEcho) FormBool(c echo.Context, param string) (bool, error) {
 	str := strings.ToLower(strings.TrimSpace(c.FormValue(param)))
 	if str == "" {

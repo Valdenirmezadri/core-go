@@ -24,6 +24,7 @@ type HelperEcho interface {
 	FormToString(c echo.Context, param string) (string, error)
 	FormToUint(c echo.Context, param string) (uint, error)
 	FormBool(c echo.Context, param string) (bool, error)
+	FormToBool(c echo.Context, param string) (bool, error)
 	RequiredParamToString(c echo.Context, param string) (string, error)
 	RequiredParamToUint(c echo.Context, param string) (uint, error)
 	ParamToString(c echo.Context, param string) (string, error)
