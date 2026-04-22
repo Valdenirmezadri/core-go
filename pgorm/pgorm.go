@@ -19,6 +19,7 @@ type DB interface {
 	Conn() *gorm.DB
 	Read(ctx context.Context) *gorm.DB
 	Write(ctx context.Context) *gorm.DB
+	Fetch(ctx context.Context, opts ...QueryOption) *gorm.DB
 	Version() (version *version.Version, err error)
 	NewVersion(ver string) (version *version.Version, err error)
 	UpdateVersion(newVer *version.Version) error
@@ -36,6 +37,10 @@ func (c *conn) Conn() *gorm.DB {
 
 func (c *conn) Read(ctx context.Context) *gorm.DB {
 	return c.Conn().WithContext(ctx)
+}
+
+func (c *conn) Fetch(ctx context.Context, opts ...QueryOption) *gorm.DB {
+	return applyOptions(c.Read(ctx), opts)
 }
 
 func (c *conn) Write(ctx context.Context) *gorm.DB {

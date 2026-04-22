@@ -80,6 +80,10 @@ func (c *htContext) Read() *gorm.DB { return c.db() }
 
 func (c *htContext) Write() *gorm.DB { return c.db() }
 
+func (c *htContext) Fetch(opts ...pgorm.QueryOption) *gorm.DB {
+	return c.conn.Fetch(c.Context(), opts...)
+}
+
 func (c *htContext) BeginTransaction(id string) {
 	conn := c.conn.Conn()
 	if conn == nil {

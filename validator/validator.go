@@ -21,12 +21,14 @@ type Validator interface {
 	String(ctx corectx.Context, s string, field string) error
 	Bytes(ctx corectx.Context, data []byte, field string) error
 	Nil(ctx corectx.Context, value any, field string) error
+	Slice(ctx corectx.Context, length int, field string) error
 	Time(ctx corectx.Context, value time.Time, field string) error
 	TimeBetween(ctx corectx.Context, start, end time.Time) error
 	URL(ctx corectx.Context, url, field string) error
 	Email(ctx corectx.Context, email, field string) error
 	Password(ctx corectx.Context, password, passwordMatch string) error
 }
+
 
 type validator struct {
 	t i18n.Switch
@@ -39,6 +41,13 @@ func New(logger func() i18n.Logger) (Validator, error) {
 	}
 
 	return &validator{t: t}, nil
+}
+
+func (v *validator) Slice(ctx corectx.Context, length int, field string) error {
+	if length == 0 {
+		return v.err(ctx, "slice", field)
+	}
+	return nil
 }
 
 func (v *validator) Nil(ctx corectx.Context, value any, field string) error {
@@ -103,9 +112,14 @@ func (v *validator) Email(ctx corectx.Context, email, field string) error {
 }
 
 func (v *validator) Password(ctx corectx.Context, password, passwordMatch string) error {
+	if password == "" {
+		return errors.New(v.t.S(ctx, "PasswordEmpty", nil))
+	}
+
 	if password != passwordMatch {
 		return errors.New(v.t.S(ctx, "PasswordMismatch", nil))
 	}
+
 	return nil
 }
 

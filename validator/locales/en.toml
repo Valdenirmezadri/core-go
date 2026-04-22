@@ -16,5 +16,8 @@ other = "end time must be after start time"
 [InvalidEmail]
 other = "invalid email '{{.Field}}'"
 
+[PasswordEmpty]
+other = "password empty"
+
 [PasswordMismatch]
 other = "password and password confirmation do not match"

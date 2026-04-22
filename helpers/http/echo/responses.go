@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Valdenirmezadri/core-go/context/corectx"
 	"github.com/Valdenirmezadri/core-go/i18n"
 	"github.com/Valdenirmezadri/core-go/slices"
 	"github.com/labstack/echo/v4"
@@ -17,37 +18,37 @@ var localeFS embed.FS
 type Helper interface {
 	Bind(c echo.Context, i interface{}) error
 
-	RequiredPropToString(c echo.Context, propName string) (string, error)
-	PropToString(c echo.Context, propName string, required bool) (string, error)
-	RequiredPropToUint(c echo.Context, propName string) (uint, error)
-	PropToUint(c echo.Context, propName string, required bool) (uint, error)
-	RequiredPropToBool(c echo.Context, propName string) (bool, error)
-	PropToBool(c echo.Context, propName string, required bool) (bool, error)
+	RequiredPropToString(ctx corectx.Context, c echo.Context, propName string) (string, error)
+	PropToString(ctx corectx.Context, c echo.Context, propName string, required bool) (string, error)
+	RequiredPropToUint(ctx corectx.Context, c echo.Context, propName string) (uint, error)
+	PropToUint(ctx corectx.Context, c echo.Context, propName string, required bool) (uint, error)
+	RequiredPropToBool(ctx corectx.Context, c echo.Context, propName string) (bool, error)
+	PropToBool(ctx corectx.Context, c echo.Context, propName string, required bool) (bool, error)
 
-	RequiredFormToString(c echo.Context, param string) (string, error)
-	RequiredFormToUint(c echo.Context, param string) (uint, error)
-	FormToString(c echo.Context, param string) (string, error)
-	FormToUint(c echo.Context, param string) (uint, error)
-	FormBool(c echo.Context, param string) (bool, error)
-	FormToBool(c echo.Context, param string) (bool, error)
+	RequiredFormToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	RequiredFormToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	FormToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	FormToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	FormBool(ctx corectx.Context, c echo.Context, param string) (bool, error)
+	FormToBool(ctx corectx.Context, c echo.Context, param string) (bool, error)
 
-	RequiredParamToString(c echo.Context, param string) (string, error)
-	RequiredParamToUint(c echo.Context, param string) (uint, error)
-	ParamToString(c echo.Context, param string) (string, error)
-	ParamToUint(c echo.Context, param string) (uint, error)
+	RequiredParamToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	RequiredParamToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	ParamToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	ParamToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
 
-	RequiredQueryToString(c echo.Context, param string) (string, error)
-	RequiredQueryToUint(c echo.Context, param string) (uint, error)
-	QueryToString(c echo.Context, param string) (string, error)
-	QueryToUint(c echo.Context, param string) (uint, error)
-	QueryToBool(c echo.Context, param string) (bool, error)
+	RequiredQueryToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	RequiredQueryToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	QueryToString(ctx corectx.Context, c echo.Context, param string) (string, error)
+	QueryToUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	QueryToBool(ctx corectx.Context, c echo.Context, param string) (bool, error)
 
-	RequiredQueryToDateTime(c echo.Context, param string) (time.Time, error)
-	QueryToDateTime(c echo.Context, param string) (time.Time, error)
-	RequiredQueryToDate(c echo.Context, param string) (time.Time, error)
-	QueryToDate(c echo.Context, param string) (time.Time, error)
-	RequiredQueryToTime(c echo.Context, param string) (time.Time, error)
-	QueryToTime(c echo.Context, param string) (time.Time, error)
+	RequiredQueryToDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryToDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	RequiredQueryToDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryToDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	RequiredQueryToTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryToTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
 
 	Response(c echo.Context, data any) error
 	ResponseMessage(c echo.Context, message string) error
@@ -61,42 +62,44 @@ type Helper interface {
 	RelayResponse(c echo.Context, code int, b []byte) error
 
 	// Aliases
-	ReqPropStr(c echo.Context, propName string) (string, error)
-	PropStr(c echo.Context, propName string, required bool) (string, error)
-	ReqPropUint(c echo.Context, propName string) (uint, error)
-	PropUint(c echo.Context, propName string, required bool) (uint, error)
-	ReqPropBool(c echo.Context, propName string) (bool, error)
-	PropBool(c echo.Context, propName string, required bool) (bool, error)
+	ReqPropStr(ctx corectx.Context, c echo.Context, propName string) (string, error)
+	PropStr(ctx corectx.Context, c echo.Context, propName string, required bool) (string, error)
+	ReqPropUint(ctx corectx.Context, c echo.Context, propName string) (uint, error)
+	PropUint(ctx corectx.Context, c echo.Context, propName string, required bool) (uint, error)
+	ReqPropBool(ctx corectx.Context, c echo.Context, propName string) (bool, error)
+	PropBool(ctx corectx.Context, c echo.Context, propName string, required bool) (bool, error)
 
-	ReqFormStr(c echo.Context, param string) (string, error)
-	ReqFormUint(c echo.Context, param string) (uint, error)
-	FormStr(c echo.Context, param string) (string, error)
-	FormUint(c echo.Context, param string) (uint, error)
+	ReqFormStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	ReqFormUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	FormStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	FormUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
 
-	ReqParamStr(c echo.Context, param string) (string, error)
-	ReqParamUint(c echo.Context, param string) (uint, error)
-	ParamStr(c echo.Context, param string) (string, error)
-	ParamUint(c echo.Context, param string) (uint, error)
+	ReqParamStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	ReqParamUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	ParamStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	ParamUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
 
-	ReqQueryStr(c echo.Context, param string) (string, error)
-	ReqQueryUint(c echo.Context, param string) (uint, error)
-	QueryStr(c echo.Context, param string) (string, error)
-	QueryUint(c echo.Context, param string) (uint, error)
-	QueryBool(c echo.Context, param string) (bool, error)
+	ReqQueryStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	ReqQueryUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	QueryStr(ctx corectx.Context, c echo.Context, param string) (string, error)
+	QueryUint(ctx corectx.Context, c echo.Context, param string) (uint, error)
+	QueryBool(ctx corectx.Context, c echo.Context, param string) (bool, error)
 
-	ReqQueryDateTime(c echo.Context, param string) (time.Time, error)
-	QueryDateTime(c echo.Context, param string) (time.Time, error)
-	ReqQueryDate(c echo.Context, param string) (time.Time, error)
-	QueryDate(c echo.Context, param string) (time.Time, error)
-	ReqQueryTime(c echo.Context, param string) (time.Time, error)
-	QueryTime(c echo.Context, param string) (time.Time, error)
+	ReqQueryDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	ReqQueryDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	ReqQueryTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	QueryTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)
+	BadReqErr(c echo.Context, err error) error
 
+	WriteSSE(e echo.Context, ID uint, kind string, data any) error
+	WriteSSEPong(e echo.Context) error
 	Res(c echo.Context, data any) error
 	ResMsg(c echo.Context, message string) error
 	ResAction(c echo.Context, message string, data any) error
 	ResCodeErr(c echo.Context, code int, errs ...error) error
 	ResErr(c echo.Context, err error) error
-	BadReqErr(c echo.Context, err error) error
 	RelayRes(c echo.Context, code int, b []byte) error
 }
 

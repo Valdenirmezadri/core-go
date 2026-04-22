@@ -16,5 +16,8 @@ other = "tempo final deve ser após tempo inicial"
 [InvalidEmail]
 other = "email inválido '{{.Field}}'"
 
+[PasswordEmpty]
+other = "senha vazia"
+
 [PasswordMismatch]
 other = "senha e confirmação de senha não coincidem"

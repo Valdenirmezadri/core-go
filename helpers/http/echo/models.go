@@ -1,6 +1,8 @@
 package helperecho
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Result struct {
 	Message string `json:"message,omitempty"`

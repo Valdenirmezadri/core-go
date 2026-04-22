@@ -3,6 +3,7 @@ package helperecho
 import (
 	"time"
 
+	"github.com/Valdenirmezadri/core-go/context/corectx"
 	"github.com/labstack/echo/v4"
 )
 
@@ -10,25 +11,25 @@ const (
 	layout = "2006-01-02" // Para datas no formato "YYYY-MM-DD"
 )
 
-func (h *helper) RequiredQueryToDate(c echo.Context, param string) (time.Time, error) {
-	return h._queryToDate(c, param, true)
+func (h *helper) RequiredQueryToDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error) {
+	return h._queryToDate(ctx, c, param, true)
 }
 
-func (h *helper) QueryToDate(c echo.Context, param string) (time.Time, error) {
-	return h._queryToDate(c, param, false)
+func (h *helper) QueryToDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error) {
+	return h._queryToDate(ctx, c, param, false)
 }
 
-func (h *helper) _queryToDate(c echo.Context, param string, required bool) (time.Time, error) {
+func (h *helper) _queryToDate(ctx corectx.Context, c echo.Context, param string, required bool) (time.Time, error) {
 	strID := c.QueryParam(param)
 	if strID == "" {
 		if required {
-			return time.Time{}, h.errT("QueryDateRequired", param)
+			return time.Time{}, h.errT(ctx, "QueryDateRequired", param)
 		}
 
 		return time.Time{}, nil
 	}
 
-	date, err := h._convStrToDate(strID, param, required)
+	date, err := h._convStrToDate(ctx, strID, param, required)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -36,11 +37,11 @@ func (h *helper) _queryToDate(c echo.Context, param string, required bool) (time
 	return date.Truncate(24 * time.Hour), nil
 }
 
-func (h *helper) _convStrToDate(str, param string, required bool) (time.Time, error) {
+func (h *helper) _convStrToDate(ctx corectx.Context, str, param string, required bool) (time.Time, error) {
 	parsedTime, err := time.Parse(layout, str)
 	if err != nil {
 		if required {
-			return time.Time{}, h.errT("QueryDateInvalid", param)
+			return time.Time{}, h.errT(ctx, "QueryDateInvalid", param)
 		}
 
 		return time.Time{}, nil
@@ -50,5 +51,5 @@ func (h *helper) _convStrToDate(str, param string, required bool) (time.Time, er
 }
 
 // Aliases
-func (h *helper) ReqQueryDate(c echo.Context, param string) (time.Time, error) { return h.RequiredQueryToDate(c, param) }
-func (h *helper) QueryDate(c echo.Context, param string) (time.Time, error)    { return h.QueryToDate(c, param) }
+func (h *helper) ReqQueryDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error) { return h.RequiredQueryToDate(ctx, c, param) }
+func (h *helper) QueryDate(ctx corectx.Context, c echo.Context, param string) (time.Time, error)    { return h.QueryToDate(ctx, c, param) }

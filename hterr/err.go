@@ -72,6 +72,8 @@ type Err interface {
 	PasswordMismatch(ctx corectx.Context) error
 	RecordNotFound(err error) bool
 	Is(err error, targets ...error) bool
+	As(err error, target any) bool
+	EvalAs(err error, target any, fn func() bool) bool
 }
 
 type htErr struct {
@@ -176,4 +178,24 @@ func (h *htErr) Is(err error, targets ...error) bool {
 	}
 
 	return false
+}
+
+func (h *htErr) As(err error, target any) bool {
+	return errors.As(err, target)
+}
+
+// EvalAs faz errors.As para target e, se bem-sucedido, chama fn com o valor extraído.
+// Retorna false se err não puder ser desempacotado em target.
+//
+// Exemplo:
+//
+//	var httpErr whatsmeow.DownloadHTTPError
+//	retry := h.err.EvalAs(err, &httpErr, func() bool {
+//	    return httpErr.StatusCode == 403 || httpErr.StatusCode == 401
+//	})
+func (h *htErr) EvalAs(err error, target any, fn func() bool) bool {
+	if !h.As(err, target) {
+		return false
+	}
+	return fn()
 }

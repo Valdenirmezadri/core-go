@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Valdenirmezadri/core-go/pgorm"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +20,7 @@ type Context interface {
 	Context() context.Context
 	Write() *gorm.DB
 	Read() *gorm.DB
+	Fetch(...pgorm.QueryOption) *gorm.DB
 	BeginTransaction(id string)
 	RollbackTransaction(id string)
 	RollbackIfErr(id string, err error)
