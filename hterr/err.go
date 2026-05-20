@@ -74,6 +74,7 @@ type Err interface {
 	Is(err error, targets ...error) bool
 	As(err error, target any) bool
 	EvalAs(err error, target any, fn func() bool) bool
+	Errorf(format string, a ...any) error
 }
 
 type htErr struct {
@@ -198,4 +199,8 @@ func (h *htErr) EvalAs(err error, target any, fn func() bool) bool {
 		return false
 	}
 	return fn()
+}
+
+func (h *htErr) Errorf(format string, a ...any) error {
+	return fmt.Errorf(format, a...)
 }

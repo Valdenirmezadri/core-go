@@ -101,6 +101,9 @@ type Helper interface {
 	ResCodeErr(c echo.Context, code int, errs ...error) error
 	ResErr(c echo.Context, err error) error
 	RelayRes(c echo.Context, code int, b []byte) error
+
+	ResMsgDataErrs(c echo.Context, msg string, data any, errs ...error) error
+	ResDataErrs(c echo.Context, data any, errs ...error) error
 }
 
 // HelperEcho is an alias for backward compatibility
@@ -199,4 +202,29 @@ func (h *helper) BadReqErr(c echo.Context, err error) error { return h.BadReques
 func (h *helper) ResErr(c echo.Context, err error) error    { return h.ResponseErr(c, err) }
 func (h *helper) ResCodeErr(c echo.Context, code int, errs ...error) error {
 	return h.ResponseCodeErr(c, code, errs...)
+}
+
+func (h *helper) ResDataErrs(c echo.Context, data any, errs ...error) error {
+	return h.ResCodeMsgDataErrs(c, http.StatusOK, "", data, errs...)
+}
+
+func (h *helper) ResMsgDataErrs(c echo.Context, msg string, data any, errs ...error) error {
+	return h.ResCodeMsgDataErrs(c, http.StatusOK, msg, data, errs...)
+}
+
+func (h *helper) ResCodeMsgDataErrs(c echo.Context, code int, msg string, data any, errs ...error) error {
+	if code == 0 {
+		code = http.StatusOK
+	}
+
+	var errsStr []string
+	if len(errs) > 0 {
+		errsStr = slices.Map(errs, func(e error) string { return e.Error() })
+	}
+
+	return c.JSON(code, Result{
+		Message: msg,
+		Data:    data,
+		Errors:  errsStr,
+	})
 }
