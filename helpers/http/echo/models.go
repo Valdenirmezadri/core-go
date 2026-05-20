@@ -2,11 +2,32 @@ package helperecho
 
 import (
 	"encoding/json"
+	"reflect"
 )
 
 type Result struct {
-	Message string `json:"message,omitempty"`
-	Data    any    `json:"data,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Data    any      `json:"data,omitempty"`
+	Errors  []string `json:"errors,omitempty"`
+}
+
+func (r Result) MarshalJSON() ([]byte, error) {
+	data := r.Data
+	if data != nil {
+		v := reflect.ValueOf(data)
+		if v.Kind() == reflect.Slice && v.IsNil() {
+			data = reflect.MakeSlice(v.Type(), 0, 0).Interface()
+		}
+	}
+	return json.Marshal(&struct {
+		Message string   `json:"message,omitempty"`
+		Data    any      `json:"data,omitempty"`
+		Errors  []string `json:"errors,omitempty"`
+	}{
+		Message: r.Message,
+		Data:    data,
+		Errors:  r.Errors,
+	})
 }
 
 func (Result) Unmarshall(b []byte) (v Result, err error) {
