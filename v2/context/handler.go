@@ -3,8 +3,8 @@ package appctx
 import (
 	"context"
 
-	jwtdata "github.com/Valdenirmezadri/core-go/jwt/jwt-data"
-	"github.com/Valdenirmezadri/core-go/pgorm"
+	jwtdata "github.com/Valdenirmezadri/core-go/v2/jwt/jwt-data"
+	"github.com/Valdenirmezadri/core-go/v2/pgorm"
 	"github.com/labstack/echo/v4"
 )
 

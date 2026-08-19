@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/operations"
+	"github.com/Valdenirmezadri/core-go/v2/operations"
 )
 
 type ClearMemory struct {

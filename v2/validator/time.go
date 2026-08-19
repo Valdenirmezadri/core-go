@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
 )
 
 func (v *validator) Time(ctx corectx.Context, t time.Time, field string) error {

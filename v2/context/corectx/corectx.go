@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/pgorm"
+	"github.com/Valdenirmezadri/core-go/v2/pgorm"
 	"gorm.io/gorm"
 )
 

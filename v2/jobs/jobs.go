@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 	"github.com/google/uuid"
 )
 

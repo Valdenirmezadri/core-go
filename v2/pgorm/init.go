@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	htl "github.com/Valdenirmezadri/core-go/htl"
+	htl "github.com/Valdenirmezadri/core-go/v2/htl"
 	version "github.com/hashicorp/go-version"
 	"github.com/jackc/pgx/v5/pgconn"
 )

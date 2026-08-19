@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Valdenirmezadri/core-go/htl"
-	"github.com/Valdenirmezadri/core-go/observer"
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/htl"
+	"github.com/Valdenirmezadri/core-go/v2/observer"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 	"github.com/Valdenirmezadri/viper"
 	"github.com/fsnotify/fsnotify"
 )

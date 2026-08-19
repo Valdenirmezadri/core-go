@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 	logging "github.com/Valdenirmezadri/ht-logging"
 	"gopkg.in/natefinch/lumberjack.v2"
 )

@@ -42,6 +42,8 @@ github.com/BurntSushi/toml v1.6.0 h1:dRaEfpa2VI55EwlIW72hMRHdWouJeRF7TPYhI+AUQjk
 github.com/BurntSushi/toml v1.6.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
+github.com/Valdenirmezadri/core-go v0.5.0 h1:79w1WAwRtPeKndljYZkv6mKeHoQpwtHminPZNks4EuE=
+github.com/Valdenirmezadri/core-go v0.5.0/go.mod h1:JH70GBARDTIscNcTYzpjacupHbGfWrSvxvE/54FWreg=
 github.com/Valdenirmezadri/viper v1.7.3 h1:xtoqhqZUKuiYxS4VfgbzncAuTy1ivIseV+AnNtkc84o=
 github.com/Valdenirmezadri/viper v1.7.3/go.mod h1:h6QZhV0+XZSE0cxRcK8hWqcVw1+5FAC/H2B7MHhm7PI=
 github.com/alecthomas/kingpin/v2 v2.4.0 h1:f48lwail6p8zpO1bC4TxtqACaGqHYA22qkHjHpqDjYY=

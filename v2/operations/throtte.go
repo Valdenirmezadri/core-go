@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 )
 
 type Throttle struct {

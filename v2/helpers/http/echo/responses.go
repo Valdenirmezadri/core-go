@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/context/corectx"
-	"github.com/Valdenirmezadri/core-go/i18n"
-	"github.com/Valdenirmezadri/core-go/slices"
+	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/i18n"
+	"github.com/Valdenirmezadri/core-go/v2/slices"
 	"github.com/labstack/echo/v4"
 )
 

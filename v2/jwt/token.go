@@ -3,7 +3,7 @@ package secure
 import (
 	"fmt"
 
-	"github.com/Valdenirmezadri/core-go/hterr"
+	"github.com/Valdenirmezadri/core-go/v2/hterr"
 )
 
 type TokenType uint8

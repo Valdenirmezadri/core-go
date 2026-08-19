@@ -1,7 +1,7 @@
 package safehandler
 
 import (
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 )
 
 type Item[T any] interface {

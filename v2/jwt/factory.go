@@ -1,7 +1,7 @@
 package secure
 
 import (
-	"github.com/Valdenirmezadri/core-go/hterr"
+	"github.com/Valdenirmezadri/core-go/v2/hterr"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )

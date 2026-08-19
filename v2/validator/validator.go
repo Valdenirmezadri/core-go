@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/context/corectx"
-	"github.com/Valdenirmezadri/core-go/i18n"
+	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/i18n"
 )
 
 //go:embed locales/*.toml
@@ -28,7 +28,6 @@ type Validator interface {
 	Email(ctx corectx.Context, email, field string) error
 	Password(ctx corectx.Context, password, passwordMatch string) error
 }
-
 
 type validator struct {
 	t i18n.Switch

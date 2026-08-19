@@ -1,11 +1,11 @@
 package appctx
 
 import (
-	helperecho "github.com/Valdenirmezadri/core-go/helpers/http/echo"
-	"github.com/Valdenirmezadri/core-go/hterr"
-	secure "github.com/Valdenirmezadri/core-go/jwt"
-	"github.com/Valdenirmezadri/core-go/text"
-	"github.com/Valdenirmezadri/core-go/validator"
+	helperecho "github.com/Valdenirmezadri/core-go/v2/helpers/http/echo"
+	"github.com/Valdenirmezadri/core-go/v2/hterr"
+	secure "github.com/Valdenirmezadri/core-go/v2/jwt"
+	"github.com/Valdenirmezadri/core-go/v2/text"
+	"github.com/Valdenirmezadri/core-go/v2/validator"
 )
 
 type Tools interface {

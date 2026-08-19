@@ -1,7 +1,7 @@
 package htl
 
 import (
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 	logging "github.com/Valdenirmezadri/ht-logging"
 )
 

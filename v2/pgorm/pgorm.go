@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Valdenirmezadri/core-go/environment"
-	htl "github.com/Valdenirmezadri/core-go/htl"
-	"github.com/Valdenirmezadri/core-go/safe"
+	"github.com/Valdenirmezadri/core-go/v2/environment"
+	htl "github.com/Valdenirmezadri/core-go/v2/htl"
+	"github.com/Valdenirmezadri/core-go/v2/safe"
 	"github.com/hashicorp/go-version"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

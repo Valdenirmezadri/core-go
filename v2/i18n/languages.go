@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/Valdenirmezadri/core-go/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
 )
 
 type Language string

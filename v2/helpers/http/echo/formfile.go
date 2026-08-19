@@ -3,7 +3,7 @@ package helperecho
 import (
 	"mime/multipart"
 
-	"github.com/Valdenirmezadri/core-go/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
 	"github.com/labstack/echo/v4"
 )
 
