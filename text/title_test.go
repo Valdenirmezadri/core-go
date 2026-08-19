@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_titleCase(t *testing.T) {
+func TestTitle(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
@@ -24,9 +24,9 @@ func Test_titleCase(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := titleCase(test.input)
+		result := Title(test.input)
 		if result != test.expected {
-			t.Errorf("titleCase(%q) = %q; want %q", test.input, result, test.expected)
+			t.Errorf("Title(%q) = %q; want %q", test.input, result, test.expected)
 		}
 	}
 }

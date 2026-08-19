@@ -1,14 +1,13 @@
 package pgorm
 
 import (
-	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Valdenirmezadri/core-go/environment"
 	htl "github.com/Valdenirmezadri/core-go/htl"
-	"github.com/Valdenirmezadri/core-go/safe"
 	"github.com/hashicorp/go-version"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,9 +16,6 @@ import (
 
 type DB interface {
 	Conn() *gorm.DB
-	Read(ctx context.Context) *gorm.DB
-	Write(ctx context.Context) *gorm.DB
-	Fetch(ctx context.Context, opts ...QueryOption) *gorm.DB
 	Version() (version *version.Version, err error)
 	NewVersion(ver string) (version *version.Version, err error)
 	UpdateVersion(newVer *version.Version) error
@@ -28,27 +24,21 @@ type DB interface {
 }
 
 type conn struct {
-	_gorm safe.Item[*gorm.DB]
+	lock *sync.RWMutex
+	gorm *gorm.DB
 }
 
-func (c *conn) Conn() *gorm.DB {
-	return c._gorm.Get()
-}
-
-func (c *conn) Read(ctx context.Context) *gorm.DB {
-	return c.Conn().WithContext(ctx)
-}
-
-func (c *conn) Fetch(ctx context.Context, opts ...QueryOption) *gorm.DB {
-	return applyOptions(c.Read(ctx), opts)
-}
-
-func (c *conn) Write(ctx context.Context) *gorm.DB {
-	return c.Conn().WithContext(ctx)
+func (c conn) Conn() *gorm.DB {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+	return c.gorm
 }
 
 func new(g *gorm.DB) DB {
-	return &conn{_gorm: safe.NewItemWithData(g)}
+	return &conn{
+		lock: &sync.RWMutex{},
+		gorm: g,
+	}
 }
 
 type DBConfig struct {
@@ -64,14 +54,13 @@ type DBConfig struct {
 }
 
 func (c *conn) LogLevel(env environment.Environment, l string) {
-	lvl := level(l)
+	level := level(l)
 
-	c._gorm.Update(func(g *gorm.DB) *gorm.DB {
-		config := *g.Config
-		config.Logger = newLogger(env, lvl)
-		g.Config = &config
-		return g
-	})
+	c.lock.Lock()
+	config := *c.gorm.Config
+	config.Logger = newLogger(env, level)
+	c.gorm.Config = &config
+	c.lock.Unlock()
 }
 
 func level(s string) logger.LogLevel {
@@ -106,7 +95,6 @@ func connectGORM(HOST, USER, PASS, DBNAME, sslMode, timeZone string, openConns, 
 		FullSaveAssociations: false,
 		AllowGlobalUpdate:    false,
 		Logger:               newLogger(env, logLevel),
-		CreateBatchSize:      100,
 	})
 
 	if err != nil {

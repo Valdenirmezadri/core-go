@@ -8,7 +8,6 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// RemoveAccents strips diacritical marks from s using Unicode normalization.
 func RemoveAccents(s string) string {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	output, _, _ := transform.String(t, s)

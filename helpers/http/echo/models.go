@@ -1,33 +1,10 @@
 package helperecho
 
-import (
-	"encoding/json"
-	"reflect"
-)
+import "encoding/json"
 
 type Result struct {
-	Message string   `json:"message,omitempty"`
-	Data    any      `json:"data,omitempty"`
-	Errors  []string `json:"errors,omitempty"`
-}
-
-func (r Result) MarshalJSON() ([]byte, error) {
-	data := r.Data
-	if data != nil {
-		v := reflect.ValueOf(data)
-		if v.Kind() == reflect.Slice && v.IsNil() {
-			data = reflect.MakeSlice(v.Type(), 0, 0).Interface()
-		}
-	}
-	return json.Marshal(&struct {
-		Message string   `json:"message,omitempty"`
-		Data    any      `json:"data,omitempty"`
-		Errors  []string `json:"errors,omitempty"`
-	}{
-		Message: r.Message,
-		Data:    data,
-		Errors:  r.Errors,
-	})
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
 }
 
 func (Result) Unmarshall(b []byte) (v Result, err error) {

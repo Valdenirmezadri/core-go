@@ -2,8 +2,7 @@ package text
 
 import "strings"
 
-// nonCapitalizedWords lists prepositions and articles that should remain lowercase
-// in title case, unless they are the first word.
+// Palavras que não devem ser capitalizadas, a menos que sejam a primeira palavra da string
 var nonCapitalizedWords = map[string]bool{
 	"do":  true,
 	"da":  true,
@@ -15,19 +14,10 @@ var nonCapitalizedWords = map[string]bool{
 	"na":  true,
 	"dos": true,
 	"das": true,
-	"an":  true,
-	"on":  true,
-	"the": true,
-	"to":  true,
 }
 
-// Title capitalizes each word, except common prepositions and articles.
+// Title capitaliza a primeira letra de cada palavra, exceto as que estão na lista de exceções
 func Title(s string) string {
-	return titleCase(s)
-}
-
-// titleCase capitalizes each word, except common prepositions and articles.
-func titleCase(s string) string {
 	if len(s) == 0 {
 		return s
 	}
