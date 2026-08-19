@@ -11,15 +11,15 @@ const (
 	layoutWithTime = "2006-01-02T15:04:05" // Para datas no formato "YYYY-MM-DDTHH:MM:SS"
 )
 
-func (h *helper) RequiredQueryToDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error) {
+func (h *helper) RequiredQueryToDateTime(ctx corectx.UserContext, c echo.Context, param string) (time.Time, error) {
 	return h._queryToDateTime(ctx, c, param, true)
 }
 
-func (h *helper) QueryToDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error) {
+func (h *helper) QueryToDateTime(ctx corectx.UserContext, c echo.Context, param string) (time.Time, error) {
 	return h._queryToDateTime(ctx, c, param, false)
 }
 
-func (h *helper) _queryToDateTime(ctx corectx.Context, c echo.Context, param string, required bool) (time.Time, error) {
+func (h *helper) _queryToDateTime(ctx corectx.UserContext, c echo.Context, param string, required bool) (time.Time, error) {
 	strID := c.QueryParam(param)
 	if strID == "" {
 		if required {
@@ -32,7 +32,7 @@ func (h *helper) _queryToDateTime(ctx corectx.Context, c echo.Context, param str
 	return h._convStrToDateTime(ctx, strID, param, required)
 }
 
-func (h *helper) _convStrToDateTime(ctx corectx.Context, str, param string, required bool) (time.Time, error) {
+func (h *helper) _convStrToDateTime(ctx corectx.UserContext, str, param string, required bool) (time.Time, error) {
 	parsedTime, err := time.Parse(layoutWithTime, str)
 	if err != nil {
 		if required {
@@ -46,5 +46,9 @@ func (h *helper) _convStrToDateTime(ctx corectx.Context, str, param string, requ
 }
 
 // Aliases
-func (h *helper) ReqQueryDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error) { return h.RequiredQueryToDateTime(ctx, c, param) }
-func (h *helper) QueryDateTime(ctx corectx.Context, c echo.Context, param string) (time.Time, error)    { return h.QueryToDateTime(ctx, c, param) }
+func (h *helper) ReqQueryDateTime(ctx corectx.UserContext, c echo.Context, param string) (time.Time, error) {
+	return h.RequiredQueryToDateTime(ctx, c, param)
+}
+func (h *helper) QueryDateTime(ctx corectx.UserContext, c echo.Context, param string) (time.Time, error) {
+	return h.QueryToDateTime(ctx, c, param)
+}

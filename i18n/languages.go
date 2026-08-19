@@ -39,7 +39,7 @@ func (l Language) String() string {
 }
 
 type Switch interface {
-	S(ctx corectx.Context, id string, data map[string]string) string
+	S(ctx corectx.UserContext, id string, data map[string]string) string
 }
 
 type handler struct {
@@ -60,7 +60,7 @@ func New(files fs.FS, logger func() Logger) (Switch, error) {
 	return &handler{en: en, ptBR: ptBR}, nil
 }
 
-func (h *handler) S(ctx corectx.Context, id string, data map[string]string) string {
+func (h *handler) S(ctx corectx.UserContext, id string, data map[string]string) string {
 	if ctx != nil {
 		lang := Language(ctx.User().Lang)
 

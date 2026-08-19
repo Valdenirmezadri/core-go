@@ -15,8 +15,12 @@ type User struct {
 	StartedAt time.Time
 }
 
-type Context interface {
+type UserContext interface {
 	User() User
+}
+
+type Context interface {
+	UserContext
 	Context() context.Context
 	Write() *gorm.DB
 	Read() *gorm.DB
