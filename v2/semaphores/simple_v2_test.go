@@ -198,6 +198,31 @@ func TestSimpleV2_UnlockDuasVezes(t *testing.T) {
 }
 
 // chaves diferentes não se bloqueiam
+// ttl remove a entrada ociosa, mas Lock de novo antes do ttl cancela a
+// remoção e reseta o relógio
+func TestSimpleV2_TTLExpiraOciosaEResetaEmUso(t *testing.T) {
+	const ttl = 30 * time.Millisecond
+	s := NewByKeyV2[string](ttl)
+
+	unlock := s.Lock("k")
+	unlock()
+
+	// reacessa antes do ttl: tem que cancelar a remoção agendada
+	time.Sleep(ttl / 2)
+	unlock = s.Lock("k")
+	unlock()
+
+	if restantes := entradas(t, s); restantes != 1 {
+		t.Fatalf("entrada sumiu antes do ttl contado a partir do último unlock, restantes=%d", restantes)
+	}
+
+	time.Sleep(2 * ttl)
+
+	if restantes := entradas(t, s); restantes != 0 {
+		t.Errorf("entrada ociosa não expirou depois do ttl, restantes=%d", restantes)
+	}
+}
+
 func TestSimpleV2_ChavesDiferentesNaoBloqueiam(t *testing.T) {
 	s := NewByKeyV2[string]()
 
