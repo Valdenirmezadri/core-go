@@ -28,8 +28,10 @@ type Helper interface {
 
 	RequiredFormToString(ctx corectx.UserContext, c echo.Context, param string) (string, error)
 	RequiredFormToUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error)
+	RequiredFormToUintArray(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error)
 	FormToString(ctx corectx.UserContext, c echo.Context, param string) (string, error)
 	FormToUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error)
+	FormToUintArray(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error)
 	FormBool(ctx corectx.UserContext, c echo.Context, param string) (bool, error)
 	FormToBool(ctx corectx.UserContext, c echo.Context, param string) (bool, error)
 	RequiredFormFile(ctx corectx.UserContext, c echo.Context, param string) (*multipart.FileHeader, error)
@@ -76,9 +78,11 @@ type Helper interface {
 
 	ReqFormStr(ctx corectx.UserContext, c echo.Context, param string) (string, error)
 	ReqFormUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error)
+	ReqFormUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error)
 	ReqFormFile(ctx corectx.UserContext, c echo.Context, param string) (*multipart.FileHeader, error)
 	FormStr(ctx corectx.UserContext, c echo.Context, param string) (string, error)
 	FormUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error)
+	FormUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error)
 
 	ReqParamStr(ctx corectx.UserContext, c echo.Context, param string) (string, error)
 	ReqParamUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error)

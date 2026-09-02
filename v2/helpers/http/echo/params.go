@@ -55,6 +55,42 @@ func (h *helper) formToUint(ctx corectx.UserContext, c echo.Context, param strin
 	return h.convStrToUint(strID, required)
 }
 
+func (h *helper) RequiredFormToUintArray(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.formToUintArray(ctx, c, param, true)
+}
+
+func (h *helper) FormToUintArray(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.formToUintArray(ctx, c, param, false)
+}
+
+func (h *helper) formToUintArray(ctx corectx.UserContext, c echo.Context, param string, required bool) ([]uint, error) {
+	values, err := c.FormParams()
+	if err != nil {
+		return nil, err
+	}
+
+	strs := values[param]
+	if len(strs) == 0 {
+		if required {
+			return nil, h.errT(ctx, "FormRequired", param)
+		}
+
+		return []uint{}, nil
+	}
+
+	ids := make([]uint, 0, len(strs))
+	for _, str := range strs {
+		id, err := h.convStrToUint(str, true)
+		if err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
+
 func (h *helper) ParamToString(ctx corectx.UserContext, c echo.Context, param string) (string, error) {
 	return h.paramToString(ctx, c, param, false)
 }
@@ -221,6 +257,12 @@ func (h *helper) ReqFormUint(ctx corectx.UserContext, c echo.Context, param stri
 }
 func (h *helper) FormUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error) {
 	return h.FormToUint(ctx, c, param)
+}
+func (h *helper) ReqFormUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.RequiredFormToUintArray(ctx, c, param)
+}
+func (h *helper) FormUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.FormToUintArray(ctx, c, param)
 }
 func (h *helper) ReqParamStr(ctx corectx.UserContext, c echo.Context, param string) (string, error) {
 	return h.RequiredParamToString(ctx, c, param)
