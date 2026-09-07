@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/Valdenirmezadri/core-go/v2/context/corectx"
+	"github.com/Valdenirmezadri/core-go/v2/context/transaction"
 	"github.com/Valdenirmezadri/core-go/v2/i18n"
 	"github.com/Valdenirmezadri/core-go/v2/pgorm"
-	"github.com/Valdenirmezadri/core-go/v2/safe"
 	"gorm.io/gorm"
 )
 
@@ -30,18 +30,13 @@ type Context interface {
 	Tools() Tools
 }
 
-type transaction struct {
-	id   string
-	gorm *gorm.DB
-}
-
 type htContext struct {
 	user       corectx.User
 	tools      Tools
 	useContext bool
 	ctx        context.Context
 	conn       pgorm.DB
-	tx         safe.Item[*transaction]
+	tx         transaction.Transaction
 }
 
 func newContext(ctx context.Context, lang string, userID uint, kind uint8, conn pgorm.DB, tools Tools, useContext bool) *htContext {
@@ -51,7 +46,9 @@ func newContext(ctx context.Context, lang string, userID uint, kind uint8, conn 
 		useContext: useContext,
 		ctx:        ctx,
 		conn:       conn,
-		tx:         safe.NewItem[*transaction](),
+		// lazy: o Context nasce antes de a conexão existir, e pedi-la aqui daria
+		// nil para sempre
+		tx: transaction.NewLazy(conn.Conn),
 	}
 }
 
@@ -66,15 +63,7 @@ func (c *htContext) Context() context.Context {
 	return context.Background()
 }
 
-func (c *htContext) db() *gorm.DB {
-	ctx := c.Context()
-	tx := c.tx.Get()
-	if tx != nil {
-		return tx.gorm.WithContext(ctx)
-	}
-
-	return c.conn.Conn().WithContext(ctx)
-}
+func (c *htContext) db() *gorm.DB { return c.tx.DB(c.Context()) }
 
 func (c *htContext) Read() *gorm.DB { return c.db() }
 
@@ -84,47 +73,38 @@ func (c *htContext) Fetch(opts ...pgorm.QueryOption) *gorm.DB {
 	return c.conn.Fetch(c.Context(), opts...)
 }
 
+/*
+O controle da transação vive todo no pacote transaction: aqui é só repasse, para
+o Context continuar oferecendo as mesmas quatro operações de sempre.
+*/
 func (c *htContext) BeginTransaction(id string) {
-	conn := c.conn.Conn()
-	if conn == nil {
-		return
-	}
-
-	if c.tx.Get() != nil {
-		return
-	}
-
-	gorm := conn.WithContext(c.ctx).Begin()
-
-	c.tx.Set(&transaction{id, gorm})
+	c.tx.BeginTransaction(c.Context(), id)
 }
 
 func (c *htContext) RollbackTransaction(id string) {
-	tx := c.tx.Get()
-	if tx == nil || tx.id != id {
-		return
-	}
-
-	tx.gorm.Rollback()
-
-	c.tx.Set(nil)
+	c.tx.RollbackTransaction(id)
 }
 
-func (c *htContext) RollbackIfErr(id string, err error) {
-	r := recover()
-	if err != nil || r != nil {
-		c.RollbackTransaction(id)
-	}
+/*
+RollbackIfErr repassa, e o recover fica aqui porque só alcança o panic quando é a
+própria função adiada que o chama: recuperar lá dentro do pacote devolveria nulo.
 
+O erro vai por ponteiro para o defer poder ser direto:
+
+	defer ctx.RollbackIfErr(id, &err)
+
+Por valor exigiria embrulhar num closure para o erro ser lido no return em vez da
+hora do defer — e o closure afasta o recover um frame, que é o bastante para o
+panic passar batido e a transação vazar aberta.
+*/
+func (c *htContext) RollbackIfErr(id string, err *error) {
+	c.tx.RollbackOnErr(id, err, recover())
 }
 
-func (c *htContext) CommitTransaction(id string) {
-	tx := c.tx.Get()
-	if tx == nil || tx.id != id {
-		return
-	}
+func (c *htContext) RollbackOnErr(id string, err *error, recovered any) {
+	c.tx.RollbackOnErr(id, err, recovered)
+}
 
-	tx.gorm.Commit()
-
-	c.tx.Set(nil)
+func (c *htContext) CommitTransaction(id string) error {
+	return c.tx.CommitTransaction(id)
 }
