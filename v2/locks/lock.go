@@ -3,24 +3,22 @@ package locks
 import "sync/atomic"
 
 type Locker interface {
-	Lock() (holding bool, releaser func())
+	// Lock tenta pegar a trava. Devolve alreadyLocked quando outro já está com
+	// ela — quem não pegou volta na hora, não espera a vez — e a função que
+	// solta, para quem pegou
+	Lock() (alreadyLocked bool, releaser func())
 }
 
 type handler struct {
-	lock *uint32
+	lock atomic.Bool
 }
 
 func New() Locker {
-	var r uint32 = 0
-	return &handler{lock: &r}
-}
-
-func NewwithRef(ref *uint32) Locker {
-	return &handler{lock: ref}
+	return &handler{}
 }
 
 func (u *handler) Lock() (alreadyLocked bool, releaser func()) {
-	if !atomic.CompareAndSwapUint32(u.lock, 0, 1) {
+	if !u.lock.CompareAndSwap(false, true) {
 		return true, func() {}
 	}
 
@@ -28,5 +26,5 @@ func (u *handler) Lock() (alreadyLocked bool, releaser func()) {
 }
 
 func (u *handler) Release() {
-	atomic.StoreUint32(u.lock, 0)
+	u.lock.Store(false)
 }
