@@ -19,6 +19,7 @@ type Configer[T Config] interface {
 	GetCold() T
 	Get() T
 	Subscribe(fn func(T)) uint32
+	UnSubscribe(id uint32)
 }
 
 type Logger interface {
@@ -139,6 +140,12 @@ func (r *config[T]) init() error {
 
 func (r *config[T]) Subscribe(fn func(T)) uint32 {
 	return r.pub.Subscribe(observer.NewListener[T](fn))
+}
+
+// UnSubscribe tira o listener do Subscribe; quem se inscreve com vida mais curta
+// que o config (ex.: conexão de um tenant) chama ao encerrar
+func (r *config[T]) UnSubscribe(id uint32) {
+	r.pub.UnSubscribe(id)
 }
 
 func (r *config[T]) GetCold() T {
