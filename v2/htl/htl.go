@@ -88,8 +88,13 @@ func setLevel(instance, lv string) {
 	})
 }
 
+// Log devolve nil enquanto Start não foi chamado.
 func Log() logging.Logger {
-	_, log := _to.Load(defaultInstance)
+	ok, log := _to.Load(defaultInstance)
+	if !ok {
+		return nil
+	}
+
 	return log.logging
 }
 
