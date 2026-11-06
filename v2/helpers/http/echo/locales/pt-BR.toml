@@ -4,6 +4,9 @@ other = "parâmetro de consulta '{{.Field}}' é obrigatório"
 [FormRequired]
 other = "campo de formulário '{{.Field}}' é obrigatório"
 
+[ParamRequired]
+other = "parâmetro '{{.Field}}' é obrigatório"
+
 [PathRequired]
 other = "parâmetro de rota '{{.Field}}' é obrigatório"
 

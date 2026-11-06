@@ -4,6 +4,9 @@ other = "query parameter '{{.Field}}' is required"
 [FormRequired]
 other = "form field '{{.Field}}' is required"
 
+[ParamRequired]
+other = "parameter '{{.Field}}' is required"
+
 [PathRequired]
 other = "path parameter '{{.Field}}' is required"
 

@@ -1,7 +1,9 @@
 package helperecho
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -126,6 +128,146 @@ func (h *helper) paramToUint(ctx corectx.UserContext, c echo.Context, param stri
 	}
 
 	return h.convStrToUint(strID, required)
+}
+
+// RequiredParamToStrArr lê o parâmetro repetido (ids=1&ids=2) ou um array JSON
+// (ids=["1","2"]) do form ou da query.
+// Exige ao menos um valor; valores em branco são ignorados.
+func (h *helper) RequiredParamToStrArr(ctx corectx.UserContext, c echo.Context, param string) ([]string, error) {
+	return h.paramToStrArr(ctx, c, param, true)
+}
+
+// ParamToStrArr é como RequiredParamToStrArr, mas sem valor devolve [] vazio.
+func (h *helper) ParamToStrArr(ctx corectx.UserContext, c echo.Context, param string) ([]string, error) {
+	return h.paramToStrArr(ctx, c, param, false)
+}
+
+// jsonArrToStrs converte um array JSON de textos ou números ("[1,2]") em strings.
+func jsonArrToStrs(value string) ([]string, error) {
+	decoder := json.NewDecoder(strings.NewReader(value))
+	decoder.UseNumber()
+
+	items := []any{}
+	if err := decoder.Decode(&items); err != nil {
+		return nil, err
+	}
+
+	strs := make([]string, len(items))
+	for i, item := range items {
+		switch item.(type) {
+		case string, json.Number:
+			strs[i] = fmt.Sprint(item)
+		default:
+			return nil, fmt.Errorf("invalid item %v", item)
+		}
+	}
+
+	return strs, nil
+}
+
+func (h *helper) paramToStrArr(ctx corectx.UserContext, c echo.Context, param string, required bool) ([]string, error) {
+	params, err := c.FormParams()
+	if err != nil {
+		return nil, err
+	}
+
+	values := []string{}
+	for _, value := range params[param] {
+		items := []string{value}
+		if strings.HasPrefix(strings.TrimSpace(value), "[") {
+			if items, err = jsonArrToStrs(value); err != nil {
+				return nil, fmt.Errorf("%s: %w", param, err)
+			}
+		}
+
+		for _, item := range items {
+			if item = strings.TrimSpace(item); item != "" {
+				values = append(values, item)
+			}
+		}
+	}
+
+	if len(values) == 0 && required {
+		return nil, h.errT(ctx, "ParamRequired", param)
+	}
+
+	return values, nil
+}
+
+// RequiredParamToArrStrArr lê do form ou da query um parâmetro com array de arrays
+// em JSON (groups=[["a","b"],["c","d"]]). Exige ao menos um array.
+func (h *helper) RequiredParamToArrStrArr(ctx corectx.UserContext, c echo.Context, param string) ([][]string, error) {
+	return paramToArrArr[string](h, ctx, c, param, true)
+}
+
+// ParamToArrStrArr é como RequiredParamToArrStrArr, mas sem valor devolve [] vazio.
+func (h *helper) ParamToArrStrArr(ctx corectx.UserContext, c echo.Context, param string) ([][]string, error) {
+	return paramToArrArr[string](h, ctx, c, param, false)
+}
+
+// RequiredParamToArrUintArr é como RequiredParamToArrStrArr, para números
+// (ids=[[1,2],[3,4]]). Negativo ou texto dá erro.
+func (h *helper) RequiredParamToArrUintArr(ctx corectx.UserContext, c echo.Context, param string) ([][]uint, error) {
+	return paramToArrArr[uint](h, ctx, c, param, true)
+}
+
+// ParamToArrUintArr é como RequiredParamToArrUintArr, mas sem valor devolve [] vazio.
+func (h *helper) ParamToArrUintArr(ctx corectx.UserContext, c echo.Context, param string) ([][]uint, error) {
+	return paramToArrArr[uint](h, ctx, c, param, false)
+}
+
+func paramToArrArr[T any](h *helper, ctx corectx.UserContext, c echo.Context, param string, required bool) ([][]T, error) {
+	values := [][]T{}
+	if str := strings.TrimSpace(c.FormValue(param)); str != "" {
+		if err := json.Unmarshal([]byte(str), &values); err != nil {
+			return nil, fmt.Errorf("%s: %w", param, err)
+		}
+	}
+
+	if len(values) == 0 && required {
+		return nil, h.errT(ctx, "ParamRequired", param)
+	}
+
+	return values, nil
+}
+
+// RequiredParamToUintArr lê o parâmetro repetido (ids=1&ids=2) ou um array JSON
+// (ids=[1,2]) do form ou da query.
+// Exige ao menos um valor; em branco e 0 são ignorados, como no ParamToUint.
+func (h *helper) RequiredParamToUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.paramToUintArr(ctx, c, param, true)
+}
+
+// ParamToUintArr é como RequiredParamToUintArr, mas sem valor devolve [] vazio.
+func (h *helper) ParamToUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.paramToUintArr(ctx, c, param, false)
+}
+
+func (h *helper) paramToUintArr(ctx corectx.UserContext, c echo.Context, param string, required bool) ([]uint, error) {
+	strs, err := h.paramToStrArr(ctx, c, param, false)
+	if err != nil {
+		return nil, err
+	}
+
+	values := []uint{}
+	for _, str := range strs {
+		if str == "0" {
+			continue
+		}
+
+		value, err := h.convStrToUint(str, required)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", param, err)
+		}
+
+		values = append(values, value)
+	}
+
+	if len(values) == 0 && required {
+		return nil, h.errT(ctx, "ParamRequired", param)
+	}
+
+	return values, nil
 }
 
 func (h *helper) RequiredQueryToString(ctx corectx.UserContext, c echo.Context, param string) (string, error) {
@@ -275,6 +417,30 @@ func (h *helper) ReqParamUint(ctx corectx.UserContext, c echo.Context, param str
 }
 func (h *helper) ParamUint(ctx corectx.UserContext, c echo.Context, param string) (uint, error) {
 	return h.ParamToUint(ctx, c, param)
+}
+func (h *helper) ReqParamStrArr(ctx corectx.UserContext, c echo.Context, param string) ([]string, error) {
+	return h.RequiredParamToStrArr(ctx, c, param)
+}
+func (h *helper) ParamStrArr(ctx corectx.UserContext, c echo.Context, param string) ([]string, error) {
+	return h.ParamToStrArr(ctx, c, param)
+}
+func (h *helper) ReqParamArrStrArr(ctx corectx.UserContext, c echo.Context, param string) ([][]string, error) {
+	return h.RequiredParamToArrStrArr(ctx, c, param)
+}
+func (h *helper) ParamArrStrArr(ctx corectx.UserContext, c echo.Context, param string) ([][]string, error) {
+	return h.ParamToArrStrArr(ctx, c, param)
+}
+func (h *helper) ReqParamArrUintArr(ctx corectx.UserContext, c echo.Context, param string) ([][]uint, error) {
+	return h.RequiredParamToArrUintArr(ctx, c, param)
+}
+func (h *helper) ParamArrUintArr(ctx corectx.UserContext, c echo.Context, param string) ([][]uint, error) {
+	return h.ParamToArrUintArr(ctx, c, param)
+}
+func (h *helper) ReqParamUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.RequiredParamToUintArr(ctx, c, param)
+}
+func (h *helper) ParamUintArr(ctx corectx.UserContext, c echo.Context, param string) ([]uint, error) {
+	return h.ParamToUintArr(ctx, c, param)
 }
 func (h *helper) ReqQueryStr(ctx corectx.UserContext, c echo.Context, param string) (string, error) {
 	return h.RequiredQueryToString(ctx, c, param)
